@@ -2,7 +2,7 @@
 
 A reverse proxy gateway written from scratch in Go: authentication, per-client
 rate limiting, dynamic routing, request logging, and a circuit breaker per
-backend — all configured through Postgres and Redis instead of static config
+backend - all configured through Postgres and Redis instead of static config
 files, with a React dashboard that streams traffic live.
 
 ## What it does
