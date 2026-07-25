@@ -13,21 +13,21 @@ A request hits the gateway and passes through a middleware chain:
 auth -> rate limit -> route match -> forward -> log
 ```
 
-- **Auth** — every request needs a valid `X-API-Key` header. Keys are
+- **Auth** : every request needs a valid `X-API-Key` header. Keys are
   generated server-side and stored only as a SHA-256 hash.
-- **Rate limiting** — each client has a per-minute budget enforced with a
+- **Rate limiting** : each client has a per-minute budget enforced with a
   token bucket stored in Redis, refilling continuously rather than resetting
   all at once.
-- **Routing** — which backend a request goes to is a row in Postgres
+- **Routing** : which backend a request goes to is a row in Postgres
   (`routes`), not a hardcoded value. Changing it takes effect on the very
   next request, no redeploy.
-- **Circuit breaking** — if a backend starts failing, its circuit opens and
+- **Circuit breaking** : if a backend starts failing, its circuit opens and
   the gateway fails fast instead of hammering it, then automatically probes
   it and recovers once it's healthy again.
-- **Logging** — every request (allowed, rejected, or rate-limited) is
+- **Logging** : every request (allowed, rejected, or rate-limited) is
   written to Postgres and published to Redis pub/sub, which the dashboard
   subscribes to over WebSocket for a live traffic feed.
-- **Admin API** — a separate, separately-authenticated set of routes under
+- **Admin API** : a separate, separately-authenticated set of routes under
   `/admin` for managing routes, clients, and API keys via CRUD, so the
   gateway can be reconfigured over HTTP instead of raw SQL.
 
