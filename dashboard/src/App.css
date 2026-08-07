@@ -79,3 +79,50 @@ td {
 .row-error {
   color: #db7f7f;
 }
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actions button,
+.add-form button {
+  font-size: 0.8rem;
+  padding: 3px 8px;
+}
+
+td input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 3px 6px;
+  font-size: 0.9rem;
+}
+
+.add-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.add-form input {
+  flex: 1;
+  padding: 5px 8px;
+}
+
+.keys-panel {
+  padding: 10px 0 10px 20px;
+  border-left: 2px solid rgba(128, 128, 128, 0.3);
+}
+
+.keys-panel table {
+  margin-bottom: 8px;
+}
+
+.revealed-key {
+  background: #1a4d2e;
+  color: #7fdb9a;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  word-break: break-all;
+}

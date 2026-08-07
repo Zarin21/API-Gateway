@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
+import { GATEWAY_URL } from "./api";
+import RoutesPanel from "./RoutesPanel";
+import ClientsPanel from "./ClientsPanel";
 
-const GATEWAY_URL = "http://localhost:8080";
 const MAX_EVENTS = 50;
 
 function App() {
@@ -11,9 +13,6 @@ function App() {
   const [tokenInput, setTokenInput] = useState("");
   const [wsStatus, setWsStatus] = useState("disconnected");
   const [events, setEvents] = useState([]);
-  const [routes, setRoutes] = useState([]);
-  const [clients, setClients] = useState([]);
-  const [error, setError] = useState("");
 
   const wsRef = useRef(null);
 
@@ -26,39 +25,12 @@ function App() {
     localStorage.removeItem("adminToken");
     setToken("");
     setEvents([]);
-    setRoutes([]);
-    setClients([]);
   }
-
-  // Pull current config over the admin REST API. This only works if the
-  // gateway's CORS middleware allows this page's origin — if it's
-  // misconfigured, these fetches fail with a CORS error in the console
-  // before the request even reaches our code.
-  useEffect(() => {
-    if (!token) return;
-
-    const headers = { "X-Admin-Token": token };
-
-    Promise.all([
-      fetch(`${GATEWAY_URL}/admin/routes/`, { headers }),
-      fetch(`${GATEWAY_URL}/admin/clients/`, { headers }),
-    ])
-      .then(async ([routesRes, clientsRes]) => {
-        if (!routesRes.ok || !clientsRes.ok) {
-          throw new Error("admin token rejected");
-        }
-        setRoutes(await routesRes.json());
-        setClients(await clientsRes.json());
-        setError("");
-      })
-      .catch(() => {
-        setError("Failed to load config — check the admin token.");
-      });
-  }, [token]);
 
   // Live traffic feed. Browsers can't set custom headers on a WebSocket
   // handshake, so the token travels as a query parameter here instead of
-  // the X-Admin-Token header the REST calls above use.
+  // the X-Admin-Token header RoutesPanel/ClientsPanel use for their REST
+  // calls.
   useEffect(() => {
     if (!token) return;
 
@@ -108,8 +80,6 @@ function App() {
         <button onClick={disconnect}>Disconnect</button>
       </header>
 
-      {error && <p className="error">{error}</p>}
-
       <section>
         <h2>Live Traffic</h2>
         <table>
@@ -138,45 +108,8 @@ function App() {
         </table>
       </section>
 
-      <section>
-        <h2>Routes</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Path Prefix</th>
-              <th>Backend URL</th>
-            </tr>
-          </thead>
-          <tbody>
-            {routes.map((r) => (
-              <tr key={r.id}>
-                <td>{r.path_prefix}</td>
-                <td>{r.backend_url}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-
-      <section>
-        <h2>Clients</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Rate Limit / min</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clients.map((c) => (
-              <tr key={c.id}>
-                <td>{c.name}</td>
-                <td>{c.rate_limit_per_minute}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <RoutesPanel token={token} />
+      <ClientsPanel token={token} />
     </div>
   );
 }
